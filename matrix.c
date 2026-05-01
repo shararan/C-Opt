@@ -173,7 +173,7 @@ double matrix_norm(const matrix* A) {
     return sqrt(out);
 }
 
-void matrix_multiply_scalar(const matrix* A, double c) {
+void matrix_multiply_scalar(matrix* A, double c) {
     uint64_t size = (uint64_t)A->rows * A->cols;
 
     for (uint64_t i = 0; i < size; i++) {

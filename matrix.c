@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
+#include <matrix.h>
 
 typedef struct matrix {
     uint32_t rows;
@@ -21,7 +22,7 @@ matrix* matrix_create(uint32_t rows, uint32_t cols) {
 
     mat->rows = rows;
     mat->cols = cols;
-    mat->data = (double *)malloc(rows * cols * sizeof(double));
+    mat->data = (double *)malloc((uint64_t)rows * cols * sizeof(double));
 
     if (mat->data == NULL) {
         printf("No memory to allocate matrix\n");
@@ -31,6 +32,14 @@ matrix* matrix_create(uint32_t rows, uint32_t cols) {
     }
     return mat;  
 };
+
+bool matrix_copy(matrix* A, matrix* B) { // from A to B
+    if (A->rows != B->rows || A->cols != B->cols) { return false; }
+
+    memcpy(A->data, B->data, A->rows * A->cols * (sizeof(double)));
+
+    return true;
+}
 
 void matrix_free(matrix* A) {
     free(A->data);
@@ -47,6 +56,16 @@ void matrix_fill(matrix* A, double x) {
 
 void matrix_fill_zeros(matrix* A) {
     memset(A->data, 0, sizeof(double) * (uint64_t)A->rows * A->cols);
+}
+
+bool matrix_fill_identity(matrix* A) {
+    if (A->rows != A->cols) { return false; }
+
+    matrix_fill_zeros(A);
+    for (uint32_t i = 0; i < A->rows; i++) {
+        A->data[i * A->cols + i] = 1.0;
+    }
+    return true;
 }
 
 bool matrix_add(matrix* out, const matrix* A, const matrix* B) { 
@@ -180,6 +199,16 @@ void matrix_multiply_scalar(matrix* A, double c) {
         A->data[i] *= c;
     }
 }
+
+// bool matrix_add_scale(matrix *A, matrix* p, double c) { // A = A + c*p for some matrix p
+//     if (A->rows != p->rows || A->cols != p->cols) { return false; }
+
+//     uint64_t size = (uint64_t)A->rows * A->cols;
+//     for (uint64_t i = 0; i < size; i++) {
+//         A->data[i] = A->data[i] + c * p->data[i];
+//     }
+//     return true;
+// }
 
 int main() {
     return 0;
